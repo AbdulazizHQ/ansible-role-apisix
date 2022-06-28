@@ -1,51 +1,12 @@
 ---
 # tasks file for ansible-role-apisix
+
+# Triggers handlers from dependent roles
 - name: Trigger role handlers
   meta: flush_handlers
 
-- name: Ensure apisix conf directory is present
-  ansible.builtin.file:
-    path: /etc/apisix
-    state: directory
+- name: Setup APISIX
+  ansible.builtin.include_tasks: apisix.yml
 
-- name: Ensure apisix log directory is present
-  ansible.builtin.file:
-    path: /var/log/apisix
-    state: directory
-
-- name: Ensure apisix conf file is present
-  ansible.builtin.template:
-    src: ./templates/apisix.conf.yaml.j2
-    dest: /etc/apisix/apisix.conf.yaml
-
-- name: Ensure apisix dashboard conf file is present
-  ansible.builtin.template:
-    src: ./templates/apisix-dashboard.conf.yml.j2
-    dest: /etc/apisix/apisix-dashboard.conf.yaml.j2
-
-- name: Run apisix docker container
-  community.docker.docker_container:
-    name: apisix
-    state: started
-    image: apache/apisix:2.13.1-alpine
-    network_mode: host
-    volumes:
-      - /var/log/apisix:/usr/local/apisix/logs
-      - /etc/apisix/apisix.conf.yaml:/usr/local/apisix/conf/config.yaml
-    restart_policy: unless-stopped
-
-- name: Run apisix dashboard docker container
-  community.docker.docker_container:
-    name: apisix-dashboard
-    state: started
-    image: apache/apisix-dashboard:2.13-alpine
-    network_mode: host
-    volumes:
-      - /etc/apisix/apisix-dashboard.conf.yaml.j2:/usr/local/apisix-dashboard/conf/conf.yaml
-    restart_policy: unless-stopped
-
-- name: Open apisix dashboard port
-  ansible.posix.firewalld:
-    port: 9000/tcp
-    state: enabled
-    zone: public
+- name: Setup APISIX Dashboard
+  ansible.builtin.include_tasks: apisix-dashboard.yml

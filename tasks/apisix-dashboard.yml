@@ -1,0 +1,21 @@
+- name: Create APISIX confgiuration direcotry on host
+  ansible.builtin.template:
+    src: ./templates/apisix-dashboard.conf.yml.j2
+    dest: /etc/apisix/apisix-dashboard.conf.yaml.j2
+
+- name: Open APISIX dashboard port
+  ansible.posix.firewalld:
+    port: 9000/tcp
+    state: enabled
+    zone: public
+
+- name: Run APISIX dashboard Docker container
+  community.docker.docker_container:
+    name: apisix-dashboard
+    state: started
+    image: apache/apisix-dashboard:2.13-alpine
+    network_mode: host
+    volumes:
+      - /etc/apisix/apisix-dashboard.conf.yaml.j2:/usr/local/apisix-dashboard/conf/conf.yaml
+    restart_policy: unless-stopped
+
