@@ -12,14 +12,4 @@
   ansible.builtin.template:
     src: ./templates/apisix.conf.yaml.j2
     dest: /etc/apisix/apisix.conf.yaml
-
-- name: Run APISIX Docker container
-  community.docker.docker_container:
-    name: apisix
-    state: started
-    image: apache/apisix:2.13.1-alpine
-    network_mode: host
-    volumes:
-      - /var/log/apisix:/usr/local/apisix/logs
-      - /etc/apisix/apisix.conf.yaml:/usr/local/apisix/conf/config.yaml
-    restart_policy: unless-stopped
+  notify: Run APISIX Docker container

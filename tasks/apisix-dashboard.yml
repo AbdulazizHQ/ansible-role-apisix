@@ -2,20 +2,10 @@
   ansible.builtin.template:
     src: ./templates/apisix-dashboard.conf.yml.j2
     dest: /etc/apisix/apisix-dashboard.conf.yaml.j2
+  notify: Run APISIX dashboard Docker container
 
-- name: Open APISIX dashboard port
+- name: Ensure APISIX port is open
   ansible.posix.firewalld:
-    port: 9000/tcp
+    port: "{{ dashboard_conf['listen']['port'] }}/tcp"
     state: enabled
     zone: public
-
-- name: Run APISIX dashboard Docker container
-  community.docker.docker_container:
-    name: apisix-dashboard
-    state: started
-    image: apache/apisix-dashboard:2.13-alpine
-    network_mode: host
-    volumes:
-      - /etc/apisix/apisix-dashboard.conf.yaml.j2:/usr/local/apisix-dashboard/conf/conf.yaml
-    restart_policy: unless-stopped
-
