@@ -38,9 +38,9 @@ apisix:
   lua_module_hook: "{{ lua_module_hook }}"
   {% endif %}
   proxy_cache:
-    cache_ttl: {{ proxy_cache['cache_ttl'] }}
+    cache_ttl: {{ proxy_cache_cache_ttl }}
     zones:
-      {% for zone in proxy_cache['zones'] %}
+      {% for zone in proxy_cache_zones %}
       - name: {{ zone['name'] }}
         memory_size: {{ zone['memory_size']}}
         {% if 'disk_size' in zone %}
@@ -62,48 +62,41 @@ apisix:
   {% for addr in admin_listen %}
     ip: {{ addr['ip'] }}
     port: {{ addr['port'] }}
-
   {% endfor %}
   {% endif %}
   {% if port_admin %}
   port_admin: {{ port_admin }}
-
   {% endif %}
   {% if https_admin %}
   https_admin: {{ https_admin }}
-
   {% endif %}
   admin_api_mtls:
-    admin_ssl_cert: "{{ admin_api_mtls['admin_ssl_cert'] }}"
-    admin_ssl_cert_key: "{{ admin_api_mtls['admin_ssl_cert_key'] }}"
-    admin_ssl_ca_cert: "{{ admin_api_mtls['admin_ssl_ca_cert'] }}"
-
+    admin_ssl_cert: "{{ admin_api_mtls_admin_ssl_cert }}"
+    admin_ssl_cert_key: "{{ admin_api_mtls_admin_ssl_cert_key }}"
+    admin_ssl_ca_cert: "{{ admin_api_mtls_admin_ssl_ca_cert }}"
   admin_key:
     {% for key in admin_key%}
     - name: {{ key['name'] }}
       key: {{ key['key'] }}
       role: {{ key['role'] }}
     {% endfor %}
-
   delete_uri_tail_slash: {{ delete_uri_tail_slash }}
   normalize_uri_like_servlet: {{ normalize_uri_like_servlet }}
-
   router:
-    http: {{ router['http'] }}
-    ssl: {{ router['ssl'] }}
-
+    http: {{ router_http }}
+    ssl: {{ router_ssl }}
   {% if enable_stream_proxy %}
   stream_proxy:
-    only: {{ stream_proxy['only'] }}
+    only: {{ stream_proxy_only }}
     tcp:
-    {% for addr in stream_proxy['tcp'] %}
+    {% for addr in stream_proxy_tcp %}
       - addr: {{ addr['addr'] }}
         {% if 'tls' in addr %}
         tls: {{ addr['tls'] }}
         {% endif %}
     {% endfor %}
     udp:
-    {% for addr in stream_proxy['udp'] %}
+    {% for addr in stream_proxy_udp %}
       - addr
     {% endfor %}
   {% endif %}
@@ -120,9 +113,9 @@ apisix:
   resolver_timeout: {{ resolver_timeout }}
   enable_resolv_search_opt: {{ enable_resolv_search_opt }}
   ssl:
-    enable: {{ ssl['enable'] }}
+    enable: {{ ssl_enable }}
     listen:
-    {% for addr in ssl['listen'] %}
+    {% for addr in ssl_listen %}
       - port: {{ addr['port'] }}
       {% if 'ip' in addr %}
         ip: {{ addr['ip'] }}
@@ -131,116 +124,134 @@ apisix:
         enable_http2: {{ addr['enable_http2'] }}
       {% endif %}
     {% endfor %}
-    {% if ssl['ssl_trusted_certificate'] %}
-    ssl_trusted_certificate: {{ ssl['ssl_trusted_certificate'] }}
+    {% if ssl_trusted_certificate %}
+    ssl_trusted_certificate: {{ ssl_trusted_certificate }}
     {% endif %}
-    ssl_protocols: {{ ssl['ssl_protocols'] }}
-    ssl_ciphers: {{ ssl['ssl_ciphers'] }}
-    ssl_session_tickets: {{ ssl['ssl_session_tickets'] }}
-    key_encrypt_salt: {{ ssl['key_encrypt_salt'] }}
+    ssl_protocols: {{ ssl_protocols }}
+    ssl_ciphers: {{ ssl_ciphers }}
+    ssl_session_tickets: {{ ssl_session_tickets }}
+    key_encrypt_salt: {{ ssl_key_encrypt_salt }}
 
   enable_control: {{ enable_control }}
   {% if control %}
   control:
-    ip: {{ control['ip'] }}
-    port: {{ control['port'] }}
+    ip: {{ control_ip }}
+    port: {{ control_port }}
   {% endif %}
   disable_sync_configuration_during_start: {{ disable_sync_configuration_during_start }}
 
 nginx_config:
-  {% if 'user' in nginx_config %}
-  user: {{ nginx_config['user'] }}
+  {% if nginx_config_user %}
+  user: {{ nginx_config_user }}
   {% endif %}
-  error_log: {{ nginx_config['error_log'] }}
-  error_log_level: {{ nginx_config['error_log_level'] }}
-  worker_processes: {{ nginx_config['worker_processes'] }}
-  enable_cpu_affinity: {{ nginx_config['enable_cpu_affinity'] }}
-  worker_rlimit_nofile: {{ nginx_config['worker_rlimit_nofile'] }} 
-  worker_shutdown_timeout: {{ nginx_config['worker_shutdown_timeout'] }}   
-  max_pending_timers: {{ nginx_config['max_pending_timers'] }}
-  max_running_timers: {{ nginx_config['max_running_timers'] }}
+  error_log: {{ nginx_config_error_log }}
+  error_log_level: {{ nginx_config_error_log_level }}
+  worker_processes: {{ nginx_config_worker_processes }}
+  enable_cpu_affinity: {{ nginx_config_enable_cpu_affinity }}
+  worker_rlimit_nofile: {{ nginx_config_worker_rlimit_nofile }} 
+  worker_shutdown_timeout: {{ nginx_config_worker_shutdown_timeout }}   
+  max_pending_timers: {{ nginx_config_max_pending_timers }}
+  max_running_timers: {{ nginx_config_max_running_timers }}
   event:
-    worker_connections: {{ nginx_config['event']['worker_connections'] }}
-  {% if 'envs' in nginx_config %}
+    worker_connections: {{ nginx_config_event_worker_connections }}
+  {% if nginx_config_envs %}
   envs:
-  {% for env in nginx_config['envs'] %}
+  {% for env in nginx_config_envs %}
     - {{ env }}
   {% endfor %}
   {% endif %}
   meta:
     lua_shared_dict:
-      prometheus-metrics: {{ nginx_config['meta']['lua_shared_dict']['prometheus-metrics'] }}
+      prometheus-metrics: {{ nginx_config_meta_lua_shared_dict_prometheus_metrics }}
   stream:
-    enable_access_log: {{ nginx_config['stream']['enable_access_log'] }}
-    access_log: {{ nginx_config['stream']['access_log'] }}
-    access_log_format: {{ nginx_config['stream']['access_log_format'] }}
-    access_log_format_escape: {{ nginx_config['stream']['access_log_format_escape'] }}
+    enable_access_log: {{ nginx_config_stream_enable_access_log }}
+    access_log: {{ nginx_config_stream_access_log }}
+    access_log_format: {{ nginx_config_stream_access_log_format }}
+    access_log_format_escape: {{ nginx_config_stream_access_log_format_escape }}
     lua_shared_dict:
-      etcd-cluster-health-check-stream: {{ nginx_config['stream']['lua_shared_dict']['etcd-cluster-health-check-stream'] }}
-      lrucache-lock-stream: {{ nginx_config['stream']['lua_shared_dict']['lrucache-lock-stream'] }}
-      etcd-cluster-health-check-stream: {{ nginx_config['stream']['lua_shared_dict']['etcd-cluster-health-check-stream'] }}
-      plugin-limit-conn-stream: {{ nginx_config['stream']['lua_shared_dict']['plugin-limit-conn-stream'] }}
-  {% if nginx_config['main_configuration_snippet'] %}
-  main_configuration_snippet: {{ nginx_config['main_configuration_snippet'] }}
+      etcd-cluster-health-check-stream: {{ nginx_config_stream_lua_shared_dict_etcd_cluster_health_check_stream }}
+      lrucache-lock-stream: {{ nginx_config_stream_lua_shared_dict_lrucache_lock_stream }}
+      plugin-limit-conn-stream: {{ nginx_config_stream_lua_shared_dict_plugin_limit_conn_stream }}
+  {% if nginx_config_main_configuration_snippet %}
+  main_configuration_snippet: {{ nginx_config_main_configuration_snippet }}
   {% endif %}
-  {% if nginx_config['http_configuration_snippet'] %}
-  http_configuration_snippet: {{ nginx_config['http_configuration_snippet'] }}
+  {% if nginx_config_http_configuration_snippet %}
+  http_configuration_snippet: {{ nginx_config_http_configuration_snippet }}
   {% endif %}
-  {% if nginx_config['http_server_configuration_snippet'] %}
-  http_server_configuration_snippet: {{ nginx_config['http_server_configuration_snippet'] }}
+  {% if nginx_config_http_server_configuration_snippet %}
+  http_server_configuration_snippet: {{ nginx_config_http_server_configuration_snippet }}
   {% endif %}
-  {% if nginx_config['http_server_location_configuration_snippet'] %}
-  http_server_location_configuration_snippet: {{ nginx_config['http_server_location_configuration_snippet'] }}
+  {% if nginx_config_http_server_location_configuration_snippet %}
+  http_server_location_configuration_snippet: {{ nginx_config_http_server_location_configuration_snippet }}
   {% endif %}
-  {% if nginx_config['http_admin_configuration_snippet'] %}
-  http_admin_configuration_snippet: {{ nginx_config['http_admin_configuration_snippet'] }}
+  {% if nginx_config_http_admin_configuration_snippet %}
+  http_admin_configuration_snippet: {{ nginx_config_http_admin_configuration_snippet }}
   {% endif %}
-  {% if nginx_config['http_end_configuration_snippet'] %}
-  http_end_configuration_snippet: {{ nginx_config['http_end_configuration_snippet'] }}
+  {% if nginx_config_http_end_configuration_snippet %}
+  http_end_configuration_snippet: {{ nginx_config_http_end_configuration_snippet }}
   {% endif %}
-  {% if nginx_config['stream_configuration_snippet'] %}
-  stream_configuration_snippet: {{ nginx_config['stream_configuration_snippet'] }}
+  {% if nginx_config_stream_configuration_snippet %}
+  stream_configuration_snippet: {{ nginx_config_stream_configuration_snippet }}
   {% endif %}
   http:
-    enable_access_log: {{ nginx_config['http']['enable_access_log'] }}
-    access_log: {{ nginx_config['http']['access_log'] }}
-    access_log_format: {{ nginx_config['http']['access_log_format'] }}
-    access_log_format_escape: {{ nginx_config['http']['access_log_format_escape'] }}
-    keepalive_timeout: {{ nginx_config['http']['keepalive_timeout'] }}
-    client_header_timeout: {{ nginx_config['http']['client_header_timeout'] }}
-    client_body_timeout: {{ nginx_config['http']['client_body_timeout'] }}
-    client_max_body_size: {{ nginx_config['http']['client_max_body_size'] }}
-    send_timeout: {{ nginx_config['http']['send_timeout'] }}
-    underscores_in_headers: {{ nginx_config['http']['underscores_in_headers'] }}
-    real_ip_header: {{ nginx_config['http']['real_ip_header'] }}
-    real_ip_recursive: {{ nginx_config['http']['real_ip_recursive'] }} 
+    enable_access_log: {{ nginx_config_http_enable_access_log }}
+    access_log: {{ nginx_config_http_access_log }}
+    access_log_format: {{ nginx_config_http_access_log_format }}
+    access_log_format_escape: {{ nginx_config_http_access_log_format_escape }}
+    keepalive_timeout: {{ nginx_config_http_keepalive_timeout }}
+    client_header_timeout: {{ nginx_config_http_client_header_timeout }}
+    client_body_timeout: {{ nginx_config_http_client_body_timeout }}
+    client_max_body_size: {{ nginx_config_http_client_max_body_size }}
+    send_timeout: {{ nginx_config_http_send_timeout }}
+    underscores_in_headers: {{ nginx_config_http_underscores_in_headers }}
+    real_ip_header: {{ nginx_config_http_real_ip_header }}
+    real_ip_recursive: {{ nginx_config_http_real_ip_recursive }} 
     real_ip_from:
-    {% for ip in nginx_config['http']['real_ip_from'] %}
+    {% for ip in nginx_config_http_real_ip_from %}
       - "{{ ip }}"
     {% endfor %}
-    proxy_ssl_server_name: {{ nginx_config['http']['proxy_ssl_server_name'] }}
+    proxy_ssl_server_name: {{ nginx_config_http_proxy_ssl_server_name }}
     upstream:
-      keepalive: {{ nginx_config['http']['upstream']['keepalive'] }}
-      keepalive_requests: {{ nginx_config['http']['upstream']['keepalive_requests'] }}
-      keepalive_timeout: {{ nginx_config['http']['upstream']['keepalive_timeout'] }}
-    charset: {{ nginx_config['http']['charset'] }}
-    variables_hash_max_size: {{ nginx_config['http']['variables_hash_max_size'] }}
+      keepalive: {{ nginx_config_http_upstream_keepalive }}
+      keepalive_requests: {{ nginx_config_http_upstream_keepalive_requests }}
+      keepalive_timeout: {{ nginx_config_http_upstream_keepalive_timeout }}
+    charset: {{ nginx_config_http_charset }}
+    variables_hash_max_size: {{ nginx_config_http_variables_hash_max_size }}
     lua_shared_dict:
-    {% for key, value in nginx_config['http']['lua_shared_dict'].items() %}
-      {{ key }}: {{ value }} 
-    {% endfor %}
+      internal-status: {{ nginx_config_lua_shared_dict_internal_status}}
+      plugin-limit-req: {{ nginx_config_lua_shared_dict_plugin_limit_req}}
+      plugin-limit-count: {{ nginx_config_lua_shared_dict_plugin_limit_count}}
+      prometheus-metrics: {{ nginx_config_lua_shared_dict_prometheus_metrics}}
+      plugin-limit-conn: {{ nginx_config_lua_shared_dict_plugin_limit_conn}}
+      upstream-healthcheck: {{ nginx_config_lua_shared_dict_upstream_healthcheck}}
+      worker-events: {{ nginx_config_lua_shared_dict_worker_events}}
+      lrucache-lock: {{ nginx_config_lua_shared_dict_lrucache_lock}}
+      balancer-ewma: {{ nginx_config_lua_shared_dict_balancer_ewma}}
+      balancer-ewma-locks: {{ nginx_config_lua_shared_dict_balancer_ewma_locks}}
+      balancer-ewma-last-touched-at: {{ nginx_config_lua_shared_dict_balancer_ewma_last_touched_at}}
+      plugin-limit-count-redis-cluster-slot-lock: {{ nginx_config_lua_shared_dict_plugin_limit_count_redis_cluster_slot_lock}}
+      tracing_buffer: {{ nginx_config_lua_shared_dict_tracing_buffer}}
+      plugin-api-breaker: {{ nginx_config_lua_shared_dict_plugin_api_breaker}}
+      etcd-cluster-health-check: {{ nginx_config_lua_shared_dict_etcd_cluster_health_check}}
+      discovery: {{ nginx_config_lua_shared_dict_discovery}}
+      jwks: {{ nginx_config_lua_shared_dict_jwks}}
+      introspection: {{ nginx_config_lua_shared_dict_introspection}}
+      access-tokens: {{ nginx_config_lua_shared_dict_access_tokens}}
+      ext-plugin: {{ nginx_config_lua_shared_dict_ext_plugin}}
+      kubernetes: {{ nginx_config_lua_shared_dict_kubernetes}}
+      tars: {{ nginx_config_lua_shared_dict_tars}}
 etcd:
   host:
   {% for host in ansible_play_hosts_all %}
     - http://{{ hostvars[host]['ansible_'+private_nic_name]['ipv4']['address'] }}:2379
   {% endfor %}
-  prefix: {{ etcd['prefix'] }}
-  timeout: {{ etcd['timeout'] }}
-  startup_retry: {{ etcd['startup_retry'] }}
+  prefix: {{ etcd_prefix }}
+  timeout: {{ etcd_timeout }}
+  startup_retry: {{ etcd_startup_retry }}
   tls:
-    verify: {{ etcd['tls']['verify'] }}
+    verify: {{ etcd_tls_verify }}
 graphql:
-  max_size: {{ graphql['max_size'] }}
+  max_size: {{ graphql_max_size }}
 plugins: # sorted by priority
 {% for plugin in plugins%}
   - {{ plugin }}
