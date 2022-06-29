@@ -1,6 +1,3 @@
----
-# defaults file for ansible-role-apisix
-
 # APISIX gateway port
 node_listen: 9080
 
@@ -427,4 +424,3 @@ plugin_attr: |
           connect: 60s
           read: 60s
           send: 60s
-  
