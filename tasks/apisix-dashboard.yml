@@ -6,6 +6,6 @@
 
 - name: Ensure APISIX port is open
   ansible.posix.firewalld:
-    port: "{{ dashboard_conf['listen']['port'] }}/tcp"
+    port: "{{ dashboard_conf_listen['port'] }}/tcp"
     state: enabled
     zone: public

@@ -19,18 +19,18 @@
 # yamllint disable rule:comments-indentation
 conf:
   listen:
-    host: "{{ dashboard_conf['listen']['host'] }}"
-    port: {{ dashboard_conf['listen']['port'] }}
+    host: "{{ dashboard_conf_listen['host'] }}"
+    port: {{ dashboard_conf_listen['port'] }}
 
-  {% if 'ssl' in dashboard_conf%}
+  {% if dashboard_conf_ssl %}
   ssl:
-    host: "{{ dashboard_conf['ssl']['host'] }}"
-    port: {{ dashboard_conf['ssl']['port'] }}
-    cert: "{{ dashboard_conf['ssl']['cert'] }}"
-    key:  "{{ dashboard_conf['ssl']['key'] }}"
+    host: "{{ dashboard_conf_ssl['host'] }}"
+    port: {{ dashboard_conf_ssl['port'] }}
+    cert: "{{ dashboard_conf_ssl['cert'] }}"
+    key:  "{{ dashboard_conf_ssl['key'] }}"
   {% endif %}
   allow_list:
-  {% for ip in dashboard_conf['allow_list'] %}
+  {% for ip in dashboard_conf_allow_list %}
     - {{ip}}
   {% endfor %}
   etcd:
@@ -41,17 +41,17 @@ conf:
     prefix: /apisix
   log:
     error_log:
-      level: {{ dashboard_conf['log']['error_log']['level'] }}
-      file_path: {{ dashboard_conf['log']['error_log']['file_path'] }}
+      level: {{ dashboard_conf_log_error_log['level'] }}
+      file_path: {{ dashboard_conf_log_error_log['file_path'] }}
     access_log:
-      file_path: {{ dashboard_conf['log']['access_log']['file_path'] }}
-  max_cpu: {{ dashboard_conf['max_cpu'] }}
+      file_path: {{ dashboard_conf_log_access_log['file_path'] }}
+  max_cpu: {{ dashboard_conf_max_cpu }}
 
 authentication:
-  secret: {{ dashboard_auth['secret'] }}
-  expire_time: {{ dashboard_auth['expire_time'] }}
+  secret: {{ dashboard_auth_secret }}
+  expire_time: {{ dashboard_auth_expire_time }}
   users:
-  {% for user in dashboard_auth['users'] %}
+  {% for user in dashboard_auth_users %}
     - username: {{ user['username'] }}
       password: {{ user['password'] }}
   {% endfor %}

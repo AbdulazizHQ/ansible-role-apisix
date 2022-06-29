@@ -1,28 +1,28 @@
-dashboard_conf:
-  listen:
+dashboard_conf_listen:
     host: 0.0.0.0
     port: 9000
 
-  allow_list:
-    - 0.0.0.0/0
+dashboard_conf_ssl:
 
-  log:   
-    error_log:
-      level: warn
-      file_path: logs/error.log
-    access_log:
-      file_path: logs/access.log
+dashboard_conf_allow_list:
+  - 0.0.0.0/0
+
+dashboard_conf_log_error_log:
+  level: warn
+  file_path: logs/error.log
+dashboard_conf_log_access_log:
+  file_path: logs/access.log
     
-  max_cpu: 0
+dashboard_conf_max_cpu: 0
 
-dashboard_auth:
-  secret: secret
-  expire_time: 3600
-  users:
-    - username: admin
-      password: admin
-    - username: user
-      password: user
+
+dashboard_auth_secret: secret
+dashboard_auth_expire_time: 3600
+dashboard_auth_users:
+  - username: admin
+    password: admin
+  - username: user
+    password: user
 
 dashboard_plugins:
   - api-breaker
